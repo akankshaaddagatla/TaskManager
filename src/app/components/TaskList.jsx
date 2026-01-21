@@ -3,14 +3,12 @@
 export default function TaskList({ tasks, onEdit, onDelete }) {
   if (tasks.length === 0) {
     return (
-      <p className="text-neutral-400 text-center py-8">
-        No tasks yet. Create your first task!
-      </p>
+      <p className="text-neutral-400">No tasks yet. Create your first task!</p>
     );
   }
 
   return (
-    <ul className="flex flex-wrap gap-3 justify-center">
+    <ul className="flex flex-wrap gap-3 justify-around items-center">
       {tasks.map((task) => (
         <li
           key={task.id}

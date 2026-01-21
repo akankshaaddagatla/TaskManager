@@ -1,7 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import TaskForm from "../components/TaskForm";
+import TaskList from "../components/TaskList";
+import LogoutButton from "../components/LogoutButton";
 
 export default function TaskManager() {
   const router = useRouter();
@@ -49,6 +53,10 @@ export default function TaskManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!session?.user?.id) {
+      alert("You need to be logged in!");
+      return;
+    }
     if (!newTask.title) {
       alert("Empty Task!, please enter title");
       return;
@@ -120,87 +128,32 @@ export default function TaskManager() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center text-white">
-      <button
-        onClick={() => {
-          logOut();
-        }}
-        className=" m-4 bg-neutral-700 px-4 py-1 rounded hover:bg-neutral-600"
-      >
-        Log Out
-      </button>
+    <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center text-white p-4">
+      <LogoutButton />
+      
       <h1 className="text-3xl font-semibold m-4">Task Manager CRUD</h1>
 
-      <div>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-neutral-800 p-6 rounded-lg w-96 mb-8 space-y-4"
-        >
-          <input
-            type="text"
-            placeholder="Task Title"
-            value={newTask.title}
-            onChange={(e) => {
-              setNewTask((prev) => ({ ...prev, title: e.target.value }));
-            }}
-            className="w-full p-2 rounded bg-neutral-700 outline-none"
-          />
+      {/* Using TaskForm Component */}
+      <TaskForm
+        newTask={newTask}
+        setNewTask={setNewTask}
+        editTaskId={editTaskId}
+        onSubmit={handleSubmit}
+      />
 
-          <input
-            type="text"
-            placeholder="Task Description"
-            value={newTask.description}
-            onChange={(e) => {
-              setNewTask((prev) => ({ ...prev, description: e.target.value }));
-            }}
-            className="w-full p-2 rounded bg-neutral-700 outline-none"
-          />
-
-          <button
-            type="submit"
-            className="w-full bg-neutral-600 py-2 rounded hover:bg-neutral-500 transition"
-          >
-            {editTaskId ? "Update Task" : "Add Task"}
-          </button>
-        </form>
-      </div>
-
-      <ul className="flex flex-wrap gap-3">
-        {tasks.map((task, key) => (
-          <li
-            key={key}
-            className="border border-neutral-600 rounded-lg p-6 w-96 text-center"
-          >
-            <div>
-              <h2 className="text-xl font-medium">{task.title}</h2>
-              <p className="text-neutral-400 mt-2">{task.description}</p>
-
-              <div className="flex justify-center gap-4 mt-4">
-                <button
-                  onClick={() => {
-                    setEditTaskId(task.id);
-                    setNewTask({
-                      title: task.title,
-                      description: task.description,
-                    });
-                  }}
-                  className="bg-neutral-700 px-4 py-1 rounded hover:bg-neutral-600"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete(task.id);
-                  }}
-                  className="bg-neutral-700 px-4 py-1 rounded hover:bg-neutral-600"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Using TaskList Component */}
+      <TaskList
+        tasks={tasks}
+        onEdit={(task) => {
+          setEditTaskId(task.id);
+          setNewTask({
+            title: task.title,
+            description: task.description,
+          });
+        }}
+        onDelete={handleDelete}
+      />
     </div>
   );
+
 }
