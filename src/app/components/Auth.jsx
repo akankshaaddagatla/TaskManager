@@ -1,5 +1,5 @@
 
-export default function Auth({email, setEmail, password, setPassword, onSubmit, isSignUp, setIsSignUp, handleSubmit}){
+export default function Auth({email, setEmail, password, setPassword, isSignUp, setIsSignUp, handleSubmit}){
     return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-900 text-white">
       <div className="bg-neutral-800 p-6 rounded-lg w-96 space-y-5">

@@ -19,13 +19,6 @@ export default function TaskManager() {
     return currentSession.data.session; // Return the session
   };
 
-  const logOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      router.push("/");
-    }
-  };
-
   const fetchTasks = async () => {
     const {
       data: { session },
@@ -76,7 +69,8 @@ export default function TaskManager() {
       const { error } = await supabase
         .from("tasks")
         .update(newTask)
-        .eq("id", editTaskId);
+        .eq("id", editTaskId)
+        .eq("user_id", session.user.id);
 
       if (error) {
         console.log("Error updating task : ", error.message);
@@ -96,7 +90,11 @@ export default function TaskManager() {
       alert("You need to be logged in!");
       return;
     }
-    const {error } = await supabase.from("tasks").delete().eq("id", id).eq("user_id", session.user.id).select();
+    const { error } = await supabase
+      .from("tasks")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", session.user.id);
 
 
     if (error) {
@@ -109,7 +107,16 @@ export default function TaskManager() {
   };
 
   useEffect(() => {
-    fetchSession();
+    const checkAuth = async () => {
+      const currentSession = await fetchSession();
+      if (!currentSession) {
+        router.push("/");
+        return;
+      }
+      fetchTasks();
+    };
+
+    checkAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -117,6 +124,9 @@ export default function TaskManager() {
         // Fetch tasks only when session is set
         if (session) {
           fetchTasks();
+        } else {
+          // Redirect to login if session is lost
+          router.push("/");
         }
       },
     );
@@ -124,7 +134,7 @@ export default function TaskManager() {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center text-white p-4">
