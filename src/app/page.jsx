@@ -23,6 +23,8 @@ export default function Login() {
         console.log("Error Signing up : ", errorSignUp.message);
         return;
       }
+      // After successful sign up, redirect to tasks page
+      router.push("/tasks");
     } else {
       const { error: errorSignIn } = await supabase.auth.signInWithPassword({
         email,
