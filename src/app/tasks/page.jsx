@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
-import LogoutButton from "../components/LogoutButton";
 
 export default function TaskManager() {
   const router = useRouter();
